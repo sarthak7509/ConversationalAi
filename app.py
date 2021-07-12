@@ -11,7 +11,6 @@ from flask import jsonify
 from flask_cors import CORS
 from flask import Flask
 from coversationalAi import conversationalApi
-from intentbot import intentBot
 
 model = None
 app = Flask(__name__)
@@ -20,12 +19,17 @@ CORS(app)
 
 with open('tokenizer.pickle', 'rb') as f:
     tokenizer = pickle.load(f)
+NUM_LAYERS=2
+D_MODEL=256
+NUM_HEADS=8
+UNITS = 512
+DROPOUT=0.1
 
 model_path = 'model_weight/model3'
 
 def getmodel(model_path, tokenizer):
     global model
-    model = conversationalApi(tokenizer, model_path)
+    model = conversationalApi(tokenizer=tokenizer, model_weight_path=model_path,MAXLENGTH=100,NUM_LAYERS=NUM_LAYERS,D_MODEL=D_MODEL,NUM_HEADS=NUM_HEADS,UNITS=UNITS,DROPOUT=DROPOUT)
 
 getmodel(model_path, tokenizer)
 #this code initialize the model to start predicting

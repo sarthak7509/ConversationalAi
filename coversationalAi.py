@@ -1,31 +1,36 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
-tf.get_logger().setLevel('ERROR')
 import numpy as np
 from Transformer import TransformerModel
 import pickle
 import re
+from modelHelpers import transformer
+from modelHelpers import CustomSchedule
+from modelHelpers import loss_function,accuracy
+from modelHelpers import predict
 
 
 class conversationalApi:
-    def __init__(self, tokenizer, model_weight_path):
+    def __init__(self, tokenizer, model_weight_path,MAXLENGTH,NUM_LAYERS,D_MODEL,NUM_HEADS,UNITS,DROPOUT):
         super(conversationalApi, self).__init__()
         self.tokenizer = tokenizer
         self.model_weight_path = model_weight_path
-        self.transformer = TransformerModel()
         self.START_TOKEN, self.END_TOKEN = [self.tokenizer.vocab_size], [self.tokenizer.vocab_size + 1]
         self.VOCAB_SIZE = self.tokenizer.vocab_size + 2
-        self.MAXLENGTH = 40
-        self.NUM_LAYERS = 2
-        self.D_MODEL = 256
-        self.NUM_HEADS = 8
-        self.UNITS = 512
-        self.DROPOUT = 0.1
+        self.MAXLENGTH = MAXLENGTH
+        self.NUM_LAYERS = NUM_LAYERS
+        self.D_MODEL = D_MODEL
+        self.NUM_HEADS = NUM_HEADS
+        self.UNITS = UNITS
+        self.DROPOUT = DROPOUT
+        self.learning_rate  = CustomSchedule(self.D_MODEL)
+        self.optimizer = tf.keras.optimizers.Adam(self.learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
         print("[+]model loading")
-        self.model = self.transformer.transformer(self.VOCAB_SIZE, self.NUM_LAYERS, self.UNITS, self.D_MODEL, self.NUM_HEADS,
+        self.model = transformer(self.VOCAB_SIZE, self.NUM_LAYERS, self.UNITS, self.D_MODEL, self.NUM_HEADS,
                                      self.DROPOUT)
         self.model.load_weights(self.model_weight_path)
+        self.model.compile(optimizer=self.optimizer, loss=loss_function, metrics=[accuracy])
         print("[+]model loaded")
 
     def predict(self, sentence):
@@ -67,14 +72,22 @@ class conversationalApi:
         # sentence = '<start> ' + sentence + ' <end>'
         return sentence
 
-
 if __name__ == '__main__':
-    with open('tokenizer.pickle', 'rb') as f:
+    #To use WkiiQNa change path to wikiiQna tokenizer pickle file
+    with open('Wikiqatokenizer.pickle', 'rb') as f:
         tokenizer = pickle.load(f)
 
-    model_path = 'model_weight/model3'
-    chatbot = conversationalApi(tokenizer=tokenizer, model_weight_path=model_path)
+    #choosing hyperparameter
+    NUM_LAYERS=2
+    D_MODEL=256
+    NUM_HEADS=8
+    UNITS = 512
+    DROPOUT=0.1
+
+    #TO use wkiiQna replace it with wiikiQna weight path the weights are available on drive
+    model_path = 'model_weight_WkiiQNa\model3.h5'
+    chatbot = conversationalApi(tokenizer=tokenizer, model_weight_path=model_path,MAXLENGTH=100,NUM_LAYERS=NUM_LAYERS,D_MODEL=D_MODEL,NUM_HEADS=NUM_HEADS,UNITS=UNITS,DROPOUT=DROPOUT)
 
     # test base
-    sentence1 = chatbot.predict("I am not crazy, my mother had me tested")
+    sentence1 = chatbot.predict("What did movie theaters do for sound before synchronized sound was introduced into film")
 

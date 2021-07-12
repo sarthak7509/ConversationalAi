@@ -8,12 +8,12 @@ os.environ["PATH"] += os.pathsep + r'C:\Program Files\Graphviz\bin'
 
 
 class Decoder:
-    def decoder(self, vocab_size, num_layers, units, d_model, num_heads, dropout, name="decoder"):
+    def decoder(self, vocab_size, num_layers, units, d_model, num_heads, dropout, name='decoder'):
         inputs = tf.keras.Input(shape=(None,), name='inputs')
-        enc_outputs = tf.keras.Input(shape=(None, d_model), name="encoder_output")
+        enc_outputs = tf.keras.Input(shape=(None, d_model), name='encoder_outputs')
         look_ahead_mask = tf.keras.Input(
             shape=(1, None, None), name='look_ahead_mask')
-        padding_mask = tf.keras.Input(shape=(1, 1, None), name='padding_mask')
+        padding_mask = tf.keras.Input(shape=(1, 1, None),name='padding_mask')
 
         embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
         embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
@@ -44,7 +44,7 @@ class Decoder:
         padding_mask = tf.keras.Input(shape=(1, 1, None), name='padding_mask')
 
         attention1 = MultiHeadAttention(
-            d_model, num_heads, name="attention_1")(inputs={
+            d_model, num_heads,name="attention_1")(inputs={
             'query': inputs,
             'key': inputs,
             'value': inputs,

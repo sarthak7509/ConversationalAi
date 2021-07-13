@@ -17,6 +17,12 @@ $ git clone https://github.com/sarthak7509/ConversationalAi.git
 4) Just need to specify the model path in the code where ever it is mentioned
 5) Tokenizer is preincluded in the github file
 ### Note wikki qna bot model weights are preincluded in the git directory name model_weight_WkiiQna. So no need to download current latest weight is model3.h5
+
+### Note added a talking demo file for quick demo session of the project 
+## How to use it:-
+```shell 
+$ python talkingdemo.py -b WEIGHT_PATH -t TOKENIZER_PATH -n BOT_NAME(optional)
+```
 # encoder
 ## Single Encoder Layer
 ![alt text](/model-graphs/encoder_LAYER.png )
